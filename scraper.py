@@ -1,11 +1,20 @@
+# PYTHON GENIUS SCRAPER
+
 import requests
 from bs4 import BeautifulSoup
+import os
+
+from dotenv import load_dotenv, find_dotenv
+load_dotenv(find_dotenv())
+
+GENIUS_API_KEY = os.environ.get('GENIUS_API_KEY')
 
 base_url = 'http://api.genius.com'
 headers = {
-    'Authorization': 'Bearer ezbcoVyI8gJrL6rp-aaTOrHs9dNyzsrnmzdsSB1hE-mygC7KpigZHMSC9itaQPQ5'
+    'Authorization': 'Bearer ' + GENIUS_API_KEY
 }
 
+# list of artists to scrape from
 artists = [
             'Britney Spears',
             'Queen',
@@ -28,51 +37,48 @@ artists = [
             'Meghan Trainor',
             'Ellie Goulding',
             'Nelly Furtado',
+            'Justin Bieber',
+            'Katy Perry',
+            'Bruno Mars',
+            'Beyonce',
+            'Lorde',
+            'The Weeknd',
+            'John Legend',
+            'Rihanna',
+            'Lady Gaga',
+            'Usher',
+            'Miley Cyrus',
+            'Taylor Swift',
+            'Major Lazer',
+            'One Direction',
+            'Ed Sheeran',
+            'Sia',
+            'Ariana Grande',
+            'Calvin Harris',
+            'Mariah Carey',
+            'Madonna',
+            'Elton John',
+            'The Beatles',
+            'Michael Jackson',
+            'Bee Gees',
+            'Prince',
+            'Maroon 5',
+            'The Black Eyed Peas',
+            'P!NK',
+            'TLC',
+            'R. Kelly',
+            'Kelly Clarkson',
+            'Justin Timberlake',
+            'Alessia Cara',
+            'Shawn Mendes',
+            'Hailee Steinfeld',
+            'Jason Derulo',
+            'Adele',
+            'Zedd',
+            'Train',
+            'Selena Gomez',
+            'Kygo',
         ]
-
-#artists = [
-            #'Justin Bieber',
-            #'Katy Perry',
-            #'Bruno Mars',
-            #'Beyonce',
-            #'Lorde',
-            #'The Weeknd',
-            #'John Legend',
-            #'Rihanna',
-            #'Lady Gaga',
-            #'Usher',
-            #'Miley Cyrus',
-            #'Taylor Swift',
-            #'Major Lazer',
-            #'One Direction',
-            #'Ed Sheeran',
-            #'Sia',
-            #'Ariana Grande',
-            #'Calvin Harris',
-            #'Mariah Carey',
-            #'Madonna',
-            #'Elton John',
-            #'The Beatles',
-            #'Michael Jackson',
-            #'Bee Gees',
-            #'Prince',
-            #'Maroon 5',
-            #'The Black Eyed Peas',
-            #'P!NK',
-            #'TLC',
-            #'R. Kelly',
-            #'Kelly Clarkson',
-            #'Justin Timberlake',
-            #'Alessia Cara',
-            #'Shawn Mendes',
-            #'Hailee Steinfeld',
-            #'Jason Derulo',
-            #'Adele',
-            #'Zedd',
-            #'Train',
-            #'Selena Gomez',
-            #'Kygo',
-        #]
 
 def get_lyrics(song_api_path):
     song_url = base_url + song_api_path
@@ -82,11 +88,19 @@ def get_lyrics(song_api_path):
     #print 'path %s' % path
     page_url = 'http://genius.com' + path
     page = requests.get(page_url)
+
+    print 'Page %s' % page
+
     html = BeautifulSoup(page.text, 'html.parser')
+
+    print 'HTML %s' % html
+
     [h.extract() for h in html('script')]
-    lyrics = html.find('lyrics').get_text()
-    print lyrics
-    with open('input.txt', 'a') as f:
+    lyrics = html.find('div', { 'class': 'lyrics'}).get_text()
+
+    # print out the lyrics
+    print 'Lyrics %s' % lyrics
+    with open('data/input.txt', 'a') as f:
         f.write(lyrics.encode('utf-8'))
         f.close()
 
@@ -105,4 +119,5 @@ if __name__ == "__main__":
         song_info = None
 
         for hit in json['response']['hits']:
+            print hit['result']['api_path']
             get_lyrics(hit['result']['api_path'])
